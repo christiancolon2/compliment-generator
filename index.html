@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dev Cloud Journey | Compliment & Joke Generator</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./favicon.png" />
+
     <!-- Typography: Inter for Headings/Main Text -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -402,9 +405,9 @@
         <div
           class="corner-circle bottom-left"
           id="corner-bl"
-          style="background-color: #ef4444"
+          style="background-color: #3b82f6"
         >
-          ♥️
+          ♠️
         </div>
 
         <div class="display-area" aria-live="polite">
@@ -753,11 +756,14 @@
           const getRandom = (arr) =>
             arr[Math.floor(Math.random() * arr.length)];
 
-          DOM.cornerTR.style.backgroundColor = getRandom(CORNER_COLORS);
-          DOM.cornerBL.style.backgroundColor = getRandom(CORNER_COLORS);
+          const sharedColor = getRandom(CORNER_COLORS);
+          const sharedEmoji = getRandom(CORNER_EMOJIS);
 
-          DOM.cornerTR.textContent = getRandom(CORNER_EMOJIS);
-          DOM.cornerBL.textContent = getRandom(CORNER_EMOJIS);
+          DOM.cornerTR.style.backgroundColor = sharedColor;
+          DOM.cornerBL.style.backgroundColor = sharedColor;
+
+          DOM.cornerTR.textContent = sharedEmoji;
+          DOM.cornerBL.textContent = sharedEmoji;
         }
 
         static renderHistory(historyArray) {
@@ -822,7 +828,7 @@
             // Render setup immediately
             UIManager.renderText(data.setup);
 
-            // Delay the punchline for 2.5 seconds
+            // Delay the punchline and history update for 2.5 seconds
             AppState.punchlineTimeoutId = setTimeout(() => {
               UIManager.renderText(data.punchline, true);
 
@@ -851,6 +857,9 @@
 
       // --- 6. Initialization ---
       function bootstrapApp() {
+        // Randomize corners immediately on load so they match dynamically
+        UIManager.randomizeCorners();
+
         // Load and render initial history
         const initialHistory = StorageService.getHistory();
         UIManager.renderHistory(initialHistory);
