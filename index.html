@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dev Cloud Journey | Compliment Generator</title>
+    <title>Dev Cloud Journey | Compliment & Joke Generator</title>
 
     <!-- Typography: Inter for Headings/Main Text -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,31 +19,28 @@
     <style>
       /* --- Design Tokens (Color Palette & Typography) --- */
       :root {
-        --bg-gradient: linear-gradient(
-          -45deg,
-          #ee7752,
-          #e73c7e,
-          #23a6d5,
-          #23d5ab
-        );
-        --surface-color: rgba(255, 255, 255, 0.95);
-        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        --primary-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+        /* Casino Theme Colors */
+        --felt-green: #0b3d1f;
+        --felt-pattern: rgba(0, 0, 0, 0.15);
+        --card-bg: #ffffff;
         --text-primary: #1e293b;
         --text-secondary: #64748b;
+        --text-accent: #e11d48; /* For joke punchlines */
         --border-color: rgba(226, 232, 240, 0.8);
+        --button-dark: #0f172a;
+        --button-dark-hover: #334155;
+        --button-light: #f1f5f9;
+        --button-light-hover: #e2e8f0;
 
         --font-display: "Inter", sans-serif;
         --font-body:
           system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           Oxygen, Ubuntu, Cantarell, sans-serif;
 
+        --shadow-card:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.05);
         --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md:
-          0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
-        --radius-md: 16px;
+        --radius-card: 18px;
         --radius-sm: 8px;
       }
 
@@ -56,92 +53,38 @@
 
       body {
         font-family: var(--font-body);
-        background: var(--bg-gradient);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-        color: var(--text-primary);
+        /* Casino Felt Background */
+        background-color: var(--felt-green);
+        background-image:
+          radial-gradient(
+            circle at center,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(0, 0, 0, 0.4) 100%
+          ),
+          url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 10l10 10v-5L15 10l5-5V0L10 10zM0 10l10 10v-5L5 10l5-5V0L0 10z' fill='%23000000' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        color: #ffffff;
         line-height: 1.5;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        padding: 1.5rem;
-        overflow-x: hidden; /* Prevent scrolling from decorative shapes */
-        position: relative; /* Context for background shapes */
-      }
-
-      /* --- Decorative Background Shapes --- */
-      .bg-shape {
-        position: fixed;
-        border-radius: 50%;
-        filter: blur(80px);
-        z-index: -1;
-        opacity: 0.6;
-        animation: float 20s infinite ease-in-out;
-        pointer-events: none;
-      }
-
-      .shape-1 {
-        width: 300px;
-        height: 300px;
-        background: #6366f1;
-        top: -100px;
-        left: -100px;
-        animation-delay: 0s;
-      }
-      .shape-2 {
-        width: 400px;
-        height: 400px;
-        background: #a855f7;
-        bottom: -150px;
-        right: -150px;
-        animation-delay: -5s;
-      }
-      .shape-3 {
-        width: 250px;
-        height: 250px;
-        background: #ec4899;
-        top: 40%;
-        left: 60%;
-        animation-delay: -10s;
-      }
-
-      @keyframes float {
-        0%,
-        100% {
-          transform: translate(0, 0) scale(1);
-        }
-        33% {
-          transform: translate(40px, -60px) scale(1.1);
-        }
-        66% {
-          transform: translate(-30px, 30px) scale(0.9);
-        }
-      }
-
-      @keyframes gradientBG {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
+        padding: 2rem 1rem;
+        overflow-x: hidden;
       }
 
       /* --- Layout & Containers --- */
       .app-container {
         width: 100%;
-        max-width: 500px;
+        max-width: 400px;
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 2rem;
       }
 
       .header {
         text-align: center;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       .header h1 {
@@ -153,67 +96,111 @@
       }
 
       .header p {
-        color: var(--text-secondary);
+        color: rgba(255, 255, 255, 0.8);
         font-size: 0.875rem;
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
       }
 
-      /* --- Surface Cards --- */
+      /* --- Playing Card Surface --- */
       .card {
-        background-color: var(--surface-color);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        padding: 2.5rem 2rem;
-        box-shadow: var(--shadow-md), var(--shadow-glow);
+        background-color: var(--card-bg);
+        /* Standard playing card ratio applied to fixed dimensions */
+        width: 320px;
+        height: 448px;
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+        color: var(--text-primary);
+        /* Inner card border styling */
+        border: 1px solid #e2e8f0;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        pointer-events: none;
+      }
+
+      /* --- Dynamic Corner Circles --- */
+      .corner-circle {
+        position: absolute;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.4s ease;
+        z-index: 10;
+      }
+
+      .top-right {
+        top: 14px;
+        right: 14px;
+      }
+      .bottom-left {
+        bottom: 14px;
+        left: 14px;
+      }
+
+      /* --- Main Content Display --- */
+      .display-area {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
-        text-align: center;
-        gap: 1.5rem;
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.3s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-2px);
-        box-shadow:
-          0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04),
-          var(--shadow-glow);
-      }
-
-      /* --- Main Compliment Display --- */
-      .display-area {
-        min-height: 100px;
-        display: flex;
-        align-items: center;
         justify-content: center;
         width: 100%;
+        text-align: center;
         position: relative;
+        padding-bottom: 1rem;
       }
 
-      .compliment-text {
+      .main-text {
         font-family: var(--font-display);
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        background: var(--primary-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--text-primary);
         transition: opacity 0.3s ease;
-        line-height: 1.3;
+        line-height: 1.4;
       }
 
-      .compliment-text.animate-pop {
-        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      .punchline-text {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-accent);
+        margin-top: 1.25rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+
+      .punchline-text.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .main-text.animate-pop {
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
       }
 
       @keyframes popIn {
         0% {
           opacity: 0;
-          transform: scale(0.8) translateY(10px);
+          transform: scale(0.9) translateY(5px);
         }
         100% {
           opacity: 1;
@@ -221,38 +208,59 @@
         }
       }
 
-      /* --- Primary Action Button --- */
-      .btn-primary {
-        background: var(--primary-gradient);
-        color: #ffffff;
+      /* --- Action Buttons Inside Card --- */
+      .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-top: auto;
+        z-index: 5;
+        padding: 0 1rem;
+      }
+
+      .btn-action {
         font-family: var(--font-body);
         font-weight: 600;
-        font-size: 1.1rem;
-        padding: 1rem 1.5rem;
+        font-size: 0.95rem;
+        padding: 0.8rem 1rem;
         border: none;
         border-radius: var(--radius-sm);
         cursor: pointer;
         width: 100%;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
         display: flex;
-        align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .btn-primary {
+        background-color: var(--button-dark);
+        color: #ffffff;
+        box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2);
       }
 
       .btn-primary:hover:not(:disabled) {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        background-color: var(--button-dark-hover);
+        transform: translateY(-1px);
       }
 
-      .btn-primary:active:not(:disabled) {
+      .btn-secondary {
+        background-color: var(--button-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background-color: var(--button-light-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-action:active:not(:disabled) {
         transform: scale(0.98) translateY(0);
       }
 
-      .btn-primary:disabled {
-        opacity: 0.7;
+      .btn-action:disabled {
+        opacity: 0.6;
         cursor: not-allowed;
       }
 
@@ -261,10 +269,11 @@
         width: 24px;
         height: 24px;
         border: 3px solid var(--border-color);
-        border-bottom-color: var(--primary-action);
+        border-bottom-color: var(--button-dark);
         border-radius: 50%;
         display: inline-block;
         animation: rotation 1s linear infinite;
+        position: absolute;
       }
 
       @keyframes rotation {
@@ -280,32 +289,30 @@
         display: none !important;
       }
 
-      /* --- History Section --- */
+      /* --- History Section (Casino Panel Style) --- */
       .history-section {
-        background-color: var(--surface-color);
+        background-color: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(10px);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-card);
         padding: 1.5rem;
-        box-shadow: var(--shadow-md);
+        width: 320px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       .history-section h2 {
         font-family: var(--font-display);
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        color: var(--text-primary);
-        border-bottom: 2px solid rgba(99, 102, 241, 0.1);
-        padding-bottom: 0.75rem;
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 0.5rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-      }
-
-      .history-section h2::before {
-        content: "⏱️";
-        font-size: 1.2rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
       }
 
       .history-list {
@@ -316,55 +323,57 @@
       }
 
       .history-item {
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        background-color: #f8fafc;
-        padding: 1rem;
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 0.75rem 1rem;
         border-radius: var(--radius-sm);
-        border-left: 4px solid #8b5cf6;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        border-left: 3px solid #f59e0b;
         animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        line-height: 1.4;
+      }
+
+      .history-item.type-compliment {
+        border-left-color: #3b82f6;
+      }
+      .history-item.type-joke {
+        border-left-color: #e11d48;
       }
 
       .empty-state {
         text-align: center;
-        color: var(--text-secondary);
-        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
         font-style: italic;
-        padding: 1rem 0;
+        padding: 0.5rem 0;
       }
 
       /* --- Clear History Button --- */
       .btn-clear {
         background-color: transparent;
-        border: 1px dashed var(--text-secondary);
-        color: var(--text-secondary);
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.6);
         font-family: var(--font-body);
-        font-size: 0.85rem;
-        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
         border-radius: var(--radius-sm);
         cursor: pointer;
         width: 100%;
         margin-top: 1rem;
         transition: all 0.2s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
       }
 
       .btn-clear:hover {
-        background-color: #fef2f2;
-        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
         border-color: #ef4444;
-        transform: translateY(-1px);
       }
 
       @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateX(-20px);
+          transform: translateX(-15px);
         }
         to {
           opacity: 1;
@@ -374,45 +383,60 @@
     </style>
   </head>
   <body>
-    <!-- Decorative Background Shapes -->
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-    <div class="bg-shape shape-3"></div>
-
     <main class="app-container">
       <header class="header">
         <h1>Dev Cloud Journey</h1>
         <p>Cloud Architecture & Engineering Portfolio</p>
       </header>
 
-      <!-- Main Generator UI -->
-      <section class="card" aria-label="Compliment Generator">
+      <!-- Main Playing Card UI -->
+      <section class="card" aria-label="Interactive Content Card">
+        <!-- Dynamic Corner Indicators -->
+        <div
+          class="corner-circle top-right"
+          id="corner-tr"
+          style="background-color: #3b82f6"
+        >
+          ♠️
+        </div>
+        <div
+          class="corner-circle bottom-left"
+          id="corner-bl"
+          style="background-color: #ef4444"
+        >
+          ♥️
+        </div>
+
         <div class="display-area" aria-live="polite">
-          <p id="compliment-text" class="compliment-text">
-            Click below to initialize sequence. 🚀
+          <p id="main-text" class="main-text">
+            Pick a card to initialize sequence.
           </p>
+          <p id="punchline-text" class="punchline-text hidden"></p>
           <div
             id="loading-spinner"
             class="loader hidden"
-            aria-label="Loading compliment"
+            aria-label="Loading content"
           ></div>
         </div>
-        <button id="generate-btn" class="btn-primary">
-          <span>Generate Compliment</span>
-          <span>✨</span>
-        </button>
+
+        <!-- Action Buttons Inside Card -->
+        <div class="button-group">
+          <button id="btn-compliment" class="btn-action btn-primary">
+            Generate Compliment
+          </button>
+          <button id="btn-joke" class="btn-action btn-secondary">
+            Generate Joke
+          </button>
+        </div>
       </section>
 
       <!-- Persistent History UI -->
-      <section class="history-section" aria-label="Recent Compliments">
-        <h2>Recent Compliments</h2>
+      <section class="history-section" aria-label="Recent Items">
+        <h2>Recent Activity</h2>
         <ul id="history-list" class="history-list">
           <!-- History items injected via JavaScript -->
         </ul>
-        <button id="clear-btn" class="btn-clear hidden">
-          <span>Erase History</span>
-          <span>🗑️</span>
-        </button>
+        <button id="clear-btn" class="btn-clear hidden">Erase History</button>
       </section>
     </main>
 
@@ -421,84 +445,230 @@
     <!-- ========================================== -->
     <script>
       /**
-       * Dev Cloud Journey - Compliment Generator Logic
+       * Dev Cloud Journey - Compliment & Joke Generator Logic
        * Architected with modularity to allow seamless transition to a Cloud NoSQL DB.
        */
 
       // --- 1. Data Mock Layer ---
-      // Represents the data currently sitting in a DB collection.
-      const CLOUD_DB_MOCK = [
-        "Your code is so clean, it could be served in a hospital. 🏥",
-        "You're the CSS to my unstyled HTML. 🎨",
-        "I'd trust you with my root password. 🔑",
-        "Your architecture is more robust than a Nokia 3310. 📱",
-        "You must be a keyboard, because you're exactly my type. ⌨️",
-        "Your commits are like poetry written in binary. 📜",
-        "If you were a function, you'd be `pure` perfection. ✨",
-        "You resolve merge conflicts faster than a couples therapist. 🛋️",
-        "Your API endpoints are a joy to consume. 🍽️",
-        "You optimize loops like you're running out of time. ⏳",
-        "Even the linter has nothing bad to say about you. 😇",
-        "You debug with the swagger of a 90s hacker in a movie. 🕶️",
-        "Your documentation is so good, it belongs in a museum. 🏛️",
-        "You handle edge cases like a stunt driver handles tight corners. 🏎️",
-        "Your variables are perfectly named. *Chef's kiss*. 👨‍🍳",
-        "I'd never `git reset --hard` our friendship. 🤝",
-        "Your pull requests are a breath of fresh air. 🌬️",
-        "You could teach a masterclass on regex (and people would understand). 🧙‍♂️",
-        "You're the missing semicolon that fixes everything. ;",
-        "Your CSS grid layouts never break, even on old browsers. 🌐",
-        "You orchestrate Docker containers like a symphony conductor. 🎼",
-        "Your SQL queries are so fast, they finish before they start. ⚡",
-        "If tech debt was literal debt, you'd be a billionaire. 💰",
-        "You are the human equivalent of a 200 OK status code. ✅",
-        "You make writing tests look genuinely fun. 🧪",
-        "Your dark mode preferences are impeccably tasteful. 🌙",
-        "You navigate the command line like a wizard casting spells. 🪄",
-        "If StackOverflow goes down, I'm calling you. 📞",
-        "Your git history is a beacon of hope in a dark codebase. 🌟",
-        "You deploy to production on Fridays and sleep soundly. 🛌",
+
+      const CLOUD_DB_MOCK_COMPLIMENTS = [
+        "Your code is so clean, it could be served in a hospital.",
+        "You're the CSS to my unstyled HTML.",
+        "I'd trust you with my root password.",
+        "Your architecture is more robust than a Nokia 3310.",
+        "You must be a keyboard, because you're exactly my type.",
+        "Your commits are like poetry written in binary.",
+        "If you were a function, you'd be `pure` perfection.",
+        "You resolve merge conflicts faster than a couples therapist.",
+        "Your API endpoints are a joy to consume.",
+        "You optimize loops like you're running out of time.",
+        "Even the linter has nothing bad to say about you.",
+        "You debug with the swagger of a 90s hacker in a movie.",
+        "Your documentation is so good, it belongs in a museum.",
+        "You handle edge cases like a stunt driver handles tight corners.",
+        "Your variables are perfectly named. *Chef's kiss*.",
+        "I'd never `git reset --hard` our friendship.",
+        "Your pull requests are a breath of fresh air.",
+        "You could teach a masterclass on regex.",
+        "You're the missing semicolon that fixes everything.",
+        "Your CSS grid layouts never break, even on old browsers.",
+        "You orchestrate Docker containers like a symphony conductor.",
+        "Your SQL queries are so fast, they finish before they start.",
+        "If tech debt was literal debt, you'd be a billionaire.",
+        "You are the human equivalent of a 200 OK status code.",
+        "You make writing tests look genuinely fun.",
+        "Your dark mode preferences are impeccably tasteful.",
+        "You navigate the command line like a wizard casting spells.",
+        "If StackOverflow goes down, I'm calling you.",
+        "Your git history is a beacon of hope in a dark codebase.",
+        "You deploy to production on Fridays and sleep soundly.",
+      ];
+
+      const CLOUD_DB_MOCK_JOKES = [
+        {
+          setup: "Why did the scarecrow win an award?",
+          punchline: "Because he was outstanding in his field.",
+        },
+        { setup: "What do you call a fake noodle?", punchline: "An impasta." },
+        {
+          setup: "Why did the bicycle fall over?",
+          punchline: "Because it was two tired.",
+        },
+        {
+          setup: "What do you call a bear with no teeth?",
+          punchline: "A gummy bear.",
+        },
+        {
+          setup: "Why don't skeletons fight each other?",
+          punchline: "They don't have the guts.",
+        },
+        {
+          setup: "What do you call cheese that isn't yours?",
+          punchline: "Nacho cheese.",
+        },
+        {
+          setup: "Why did the math book look sad?",
+          punchline: "Because it had too many problems.",
+        },
+        {
+          setup: "What do you call a pony with a cough?",
+          punchline: "A little horse.",
+        },
+        {
+          setup: "Why couldn't the leopard play hide and seek?",
+          punchline: "Because he was always spotted.",
+        },
+        {
+          setup: "What do you call a sleeping dinosaur?",
+          punchline: "A dino-snore.",
+        },
+        {
+          setup: "Why did the cookie go to the hospital?",
+          punchline: "Because he felt crummy.",
+        },
+        {
+          setup: "What do you call a magic dog?",
+          punchline: "A labracadabrador.",
+        },
+        {
+          setup: "Why did the cow cross the road?",
+          punchline: "To get to the udder side.",
+        },
+        {
+          setup: "What do you call a belt made out of watches?",
+          punchline: "A waist of time.",
+        },
+        {
+          setup: "Why did the golfer bring two pairs of pants?",
+          punchline: "In case he got a hole in one.",
+        },
+        {
+          setup: "What do you call a snowman with a six-pack?",
+          punchline: "An abdominal snowman.",
+        },
+        {
+          setup: "Why did the tomato turn red?",
+          punchline: "Because it saw the salad dressing.",
+        },
+        {
+          setup: "What do you call a factory that makes okay products?",
+          punchline: "A satisfactory.",
+        },
+        {
+          setup: "Why did the computer go to the doctor?",
+          punchline: "It had a virus.",
+        },
+        {
+          setup: "What do you call a group of musical whales?",
+          punchline: "An orca-stra.",
+        },
+        {
+          setup: "Why did the picture go to jail?",
+          punchline: "Because it was framed.",
+        },
+        {
+          setup: "What do you call a pig that does karate?",
+          punchline: "A pork chop.",
+        },
+        {
+          setup: "Why did the invisible man turn down the job offer?",
+          punchline: "He couldn't see himself doing it.",
+        },
+        {
+          setup: "What do you call a fish wearing a bowtie?",
+          punchline: "Sofishsticated.",
+        },
+        {
+          setup: "Why did the stadium get hot after the game?",
+          punchline: "All the fans left.",
+        },
+        { setup: "What do you call a careful wolf?", punchline: "Aware wolf." },
+        {
+          setup: "Why did the student eat his homework?",
+          punchline: "Because the teacher told him it was a piece of cake.",
+        },
+        {
+          setup: "What do you call a bee that can't make up its mind?",
+          punchline: "A maybe.",
+        },
+        {
+          setup: "Why did the coffee file a police report?",
+          punchline: "It got mugged.",
+        },
+        {
+          setup: "What do you call a fly without wings?",
+          punchline: "A walk.",
+        },
+      ];
+
+      // Assets for the dynamic corners
+      const CORNER_COLORS = [
+        "#EF4444",
+        "#F97316",
+        "#F59E0B",
+        "#10B981",
+        "#3B82F6",
+        "#6366F1",
+        "#8B5CF6",
+        "#EC4899",
+        "#14B8A6",
+        "#0f172a",
+      ];
+      const CORNER_EMOJIS = [
+        "♠️",
+        "♥️",
+        "♦️",
+        "♣️",
+        "🎲",
+        "🎰",
+        "🍒",
+        "🍋",
+        "🔔",
+        "💎",
+        "🃏",
+        "🎩",
+        "🪙",
+        "🎯",
       ];
 
       // --- 2. Service Layer (Data Fetching) ---
       class DataService {
-        /**
-         * Simulates an asynchronous network request.
-         * ARCHITECTURE NOTE: When migrating to Firebase, only this method's internals
-         * need to change (e.g., swapping setTimeout for getDocs(collection(db, 'compliments'))).
-         */
-        static async fetchRandomCompliment(previousCompliment) {
+        static async fetchRandomItem(type, previousItem) {
           return new Promise((resolve, reject) => {
-            // Simulating 750ms network latency
+            // Simulating 600ms network latency
             setTimeout(() => {
               try {
-                let nextCompliment;
-                // Core Logic 2: Prevent consecutive duplicates
+                const db =
+                  type === "joke"
+                    ? CLOUD_DB_MOCK_JOKES
+                    : CLOUD_DB_MOCK_COMPLIMENTS;
+                let nextItem;
+
+                // Prevent consecutive duplicates
                 do {
-                  const randomIndex = Math.floor(
-                    Math.random() * CLOUD_DB_MOCK.length,
-                  );
-                  nextCompliment = CLOUD_DB_MOCK[randomIndex];
+                  const randomIndex = Math.floor(Math.random() * db.length);
+                  nextItem = db[randomIndex];
                 } while (
-                  nextCompliment === previousCompliment &&
-                  CLOUD_DB_MOCK.length > 1
+                  (type === "joke" &&
+                    previousItem &&
+                    nextItem.setup === previousItem.setup) ||
+                  (type === "compliment" && nextItem === previousItem)
                 );
 
-                resolve(nextCompliment);
+                resolve(nextItem);
               } catch (error) {
                 reject(new Error("Network request failed."));
               }
-            }, 750);
+            }, 600);
           });
         }
       }
 
       // --- 3. Storage Layer (Persistence) ---
       class StorageService {
-        static STORAGE_KEY = "devCloud_recentCompliments";
+        static STORAGE_KEY = "devCloud_recentActivity";
         static MAX_HISTORY = 3;
 
-        // Retrieve history from local storage
         static getHistory() {
           try {
             const data = localStorage.getItem(this.STORAGE_KEY);
@@ -509,12 +679,11 @@
           }
         }
 
-        // Save new item and maintain max limit
-        static saveCompliment(compliment) {
+        // Expects an object: { type: 'compliment'|'joke', text: '...' }
+        static saveItem(itemObj) {
           let history = this.getHistory();
-          history.unshift(compliment); // Add to top of the list
+          history.unshift(itemObj);
 
-          // Keep only the last 3 items
           if (history.length > this.MAX_HISTORY) {
             history.pop();
           }
@@ -523,7 +692,6 @@
           return history;
         }
 
-        // Clear the history entirely
         static clearHistory() {
           localStorage.removeItem(this.STORAGE_KEY);
           return [];
@@ -532,111 +700,168 @@
 
       // --- 4. UI/View Layer ---
       const DOM = {
-        btn: document.getElementById("generate-btn"),
-        textDisplay: document.getElementById("compliment-text"),
+        btnCompliment: document.getElementById("btn-compliment"),
+        btnJoke: document.getElementById("btn-joke"),
+        mainTextDisplay: document.getElementById("main-text"),
+        punchlineDisplay: document.getElementById("punchline-text"),
         spinner: document.getElementById("loading-spinner"),
         historyList: document.getElementById("history-list"),
         clearBtn: document.getElementById("clear-btn"),
+        cornerTR: document.getElementById("corner-tr"),
+        cornerBL: document.getElementById("corner-bl"),
       };
 
       class UIManager {
         static setLoadingState(isLoading) {
           if (isLoading) {
-            DOM.btn.disabled = true;
-            DOM.btn.querySelector("span").textContent = "Processing request...";
-            DOM.textDisplay.classList.add("hidden");
+            DOM.btnCompliment.disabled = true;
+            DOM.btnJoke.disabled = true;
+            DOM.mainTextDisplay.classList.add("hidden");
+            DOM.punchlineDisplay.classList.add("hidden");
             DOM.spinner.classList.remove("hidden");
+
+            // Reset punchline animation state
+            DOM.punchlineDisplay.classList.remove("visible");
+            DOM.punchlineDisplay.textContent = "";
           } else {
-            DOM.btn.disabled = false;
-            DOM.btn.querySelector("span").textContent = "Generate Compliment";
-            DOM.textDisplay.classList.remove("hidden");
+            DOM.btnCompliment.disabled = false;
+            DOM.btnJoke.disabled = false;
+            DOM.mainTextDisplay.classList.remove("hidden");
             DOM.spinner.classList.add("hidden");
           }
         }
 
-        static renderCompliment(text) {
-          // Remove animation class, trigger reflow, add it back to restart animation
-          DOM.textDisplay.classList.remove("animate-pop");
-          void DOM.textDisplay.offsetWidth; // Trigger DOM reflow
-          DOM.textDisplay.textContent = text;
-          DOM.textDisplay.classList.add("animate-pop");
+        static renderText(text, isPunchline = false) {
+          const targetEl = isPunchline
+            ? DOM.punchlineDisplay
+            : DOM.mainTextDisplay;
+
+          if (!isPunchline) {
+            targetEl.classList.remove("animate-pop");
+            void targetEl.offsetWidth; // Trigger DOM reflow
+            targetEl.textContent = text;
+            targetEl.classList.add("animate-pop");
+          } else {
+            targetEl.textContent = text;
+            targetEl.classList.remove("hidden");
+            // Small delay to ensure display:block applies before opacity transition
+            setTimeout(() => targetEl.classList.add("visible"), 50);
+          }
+        }
+
+        static randomizeCorners() {
+          const getRandom = (arr) =>
+            arr[Math.floor(Math.random() * arr.length)];
+
+          DOM.cornerTR.style.backgroundColor = getRandom(CORNER_COLORS);
+          DOM.cornerBL.style.backgroundColor = getRandom(CORNER_COLORS);
+
+          DOM.cornerTR.textContent = getRandom(CORNER_EMOJIS);
+          DOM.cornerBL.textContent = getRandom(CORNER_EMOJIS);
         }
 
         static renderHistory(historyArray) {
-          DOM.historyList.innerHTML = ""; // Clear current list
+          DOM.historyList.innerHTML = "";
 
           if (historyArray.length === 0) {
             DOM.historyList.innerHTML =
-              '<li class="empty-state">System ready. Awaiting first generation.</li>';
+              '<li class="empty-state">No hands played yet.</li>';
             DOM.clearBtn.classList.add("hidden");
             return;
           }
 
-          // Create and append list items safely
           historyArray.forEach((item) => {
             const li = document.createElement("li");
-            li.className = "history-item";
-            li.textContent = item;
+            li.className = `history-item type-${item.type}`;
+            li.textContent = item.text;
             DOM.historyList.appendChild(li);
           });
 
-          // Show clear button when history exists
           DOM.clearBtn.classList.remove("hidden");
         }
       }
 
       // --- 5. Application Controller ---
       const AppState = {
-        currentCompliment: null,
+        currentItem: null,
         isFetching: false,
+        punchlineTimeoutId: null,
       };
 
-      async function handleGenerateEvent() {
-        // Guard clause to prevent spam-clicking while fetching
+      async function handleGenerateEvent(type) {
         if (AppState.isFetching) return;
 
-        // 1. Update State & UI to Loading
+        // Clear any pending punchline timers if user clicks quickly
+        if (AppState.punchlineTimeoutId) {
+          clearTimeout(AppState.punchlineTimeoutId);
+        }
+
         AppState.isFetching = true;
         UIManager.setLoadingState(true);
 
         try {
-          // 2. Fetch Data (Async simulation)
-          const newCompliment = await DataService.fetchRandomCompliment(
-            AppState.currentCompliment,
+          // Fetch Data (Async simulation)
+          const data = await DataService.fetchRandomItem(
+            type,
+            AppState.currentItem,
           );
+          AppState.currentItem = data;
 
-          // 3. Update State & Persistence
-          AppState.currentCompliment = newCompliment;
-          const updatedHistory = StorageService.saveCompliment(newCompliment);
+          UIManager.randomizeCorners();
 
-          // 4. Update UI with new data
-          UIManager.renderCompliment(newCompliment);
-          UIManager.renderHistory(updatedHistory);
+          if (type === "compliment") {
+            UIManager.renderText(data);
+
+            // Save and update history immediately
+            const updatedHistory = StorageService.saveItem({
+              type: "compliment",
+              text: data,
+            });
+            UIManager.renderHistory(updatedHistory);
+          } else if (type === "joke") {
+            // Render setup immediately
+            UIManager.renderText(data.setup);
+
+            // Delay the punchline for 2.5 seconds
+            AppState.punchlineTimeoutId = setTimeout(() => {
+              UIManager.renderText(data.punchline, true);
+
+              // Wait to update history until AFTER the punchline is delivered to avoid spoilers
+              const formattedJoke = `${data.setup} ${data.punchline}`;
+              const updatedHistory = StorageService.saveItem({
+                type: "joke",
+                text: formattedJoke,
+              });
+              UIManager.renderHistory(updatedHistory);
+            }, 2500);
+          }
         } catch (error) {
           console.error("Fetch Error:", error);
-          UIManager.renderCompliment("Connection error. Please try again.");
+          UIManager.renderText("Connection error. The house wins this round.");
         } finally {
-          // 5. Cleanup Loading State
           AppState.isFetching = false;
           UIManager.setLoadingState(false);
         }
       }
 
       function handleClearEvent() {
-        // 1. Clear Storage
         const clearedHistory = StorageService.clearHistory();
-        // 2. Clear UI
         UIManager.renderHistory(clearedHistory);
       }
 
       // --- 6. Initialization ---
       function bootstrapApp() {
-        // Load and render initial history from local storage
+        // Load and render initial history
         const initialHistory = StorageService.getHistory();
         UIManager.renderHistory(initialHistory);
 
         // Attach event listeners
-        DOM.btn.addEventListener("click", handleGenerateEvent);
+        DOM.btnCompliment.addEventListener("click", () =>
+          handleGenerateEvent("compliment"),
+        );
+        DOM.btnJoke.addEventListener("click", () =>
+          handleGenerateEvent("joke"),
+        );
         DOM.clearBtn.addEventListener("click", handleClearEvent);
       }
 
