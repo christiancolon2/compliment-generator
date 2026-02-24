@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev Cloud Journey | Compliment Generator</title>
+
+    <!-- Typography: Inter for Headings/Main Text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ========================================== -->
+    <!-- STYLES.CSS EQUIVALENT                      -->
+    <!-- ========================================== -->
+    <style>
+      /* --- Design Tokens (Color Palette & Typography) --- */
+      :root {
+        --bg-gradient: linear-gradient(
+          -45deg,
+          #ee7752,
+          #e73c7e,
+          #23a6d5,
+          #23d5ab
+        );
+        --surface-color: rgba(255, 255, 255, 0.95);
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        --primary-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: rgba(226, 232, 240, 0.8);
+
+        --font-display: "Inter", sans-serif;
+        --font-body:
+          system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+        --radius-md: 16px;
+        --radius-sm: 8px;
+      }
+
+      /* --- Global Resets & Base Styles --- */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background: var(--bg-gradient);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        color: var(--text-primary);
+        line-height: 1.5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 1.5rem;
+        overflow-x: hidden; /* Prevent scrolling from decorative shapes */
+        position: relative; /* Context for background shapes */
+      }
+
+      /* --- Decorative Background Shapes --- */
+      .bg-shape {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.6;
+        animation: float 20s infinite ease-in-out;
+        pointer-events: none;
+      }
+
+      .shape-1 {
+        width: 300px;
+        height: 300px;
+        background: #6366f1;
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+      }
+      .shape-2 {
+        width: 400px;
+        height: 400px;
+        background: #a855f7;
+        bottom: -150px;
+        right: -150px;
+        animation-delay: -5s;
+      }
+      .shape-3 {
+        width: 250px;
+        height: 250px;
+        background: #ec4899;
+        top: 40%;
+        left: 60%;
+        animation-delay: -10s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(40px, -60px) scale(1.1);
+        }
+        66% {
+          transform: translate(-30px, 30px) scale(0.9);
+        }
+      }
+
+      @keyframes gradientBG {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* --- Layout & Containers --- */
+      .app-container {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .header {
+        text-align: center;
+      }
+
+      .header h1 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.25rem;
+      }
+
+      .header p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      /* --- Surface Cards --- */
+      .card {
+        background-color: var(--surface-color);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 2.5rem 2rem;
+        box-shadow: var(--shadow-md), var(--shadow-glow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04),
+          var(--shadow-glow);
+      }
+
+      /* --- Main Compliment Display --- */
+      .display-area {
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        position: relative;
+      }
+
+      .compliment-text {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: opacity 0.3s ease;
+        line-height: 1.3;
+      }
+
+      .compliment-text.animate-pop {
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.8) translateY(10px);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      /* --- Primary Action Button --- */
+      .btn-primary {
+        background: var(--primary-gradient);
+        color: #ffffff;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+      }
+
+      .btn-primary:active:not(:disabled) {
+        transform: scale(0.98) translateY(0);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      /* --- Loading State Indicators --- */
+      .loader {
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--border-color);
+        border-bottom-color: var(--primary-action);
+        border-radius: 50%;
+        display: inline-block;
+        animation: rotation 1s linear infinite;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* --- History Section --- */
+      .history-section {
+        background-color: var(--surface-color);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+      }
+
+      .history-section h2 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+        padding-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .history-section h2::before {
+        content: "⏱️";
+        font-size: 1.2rem;
+      }
+
+      .history-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .history-item {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        background-color: #f8fafc;
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+        border-left: 4px solid #8b5cf6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        font-style: italic;
+        padding: 1rem 0;
+      }
+
+      /* --- Clear History Button --- */
+      .btn-clear {
+        background-color: transparent;
+        border: 1px dashed var(--text-secondary);
+        color: var(--text-secondary);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-clear:hover {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border-color: #ef4444;
+        transform: translateY(-1px);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Decorative Background Shapes -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <main class="app-container">
+      <header class="header">
+        <h1>Dev Cloud Journey</h1>
+        <p>Cloud Architecture & Engineering Portfolio</p>
+      </header>
+
+      <!-- Main Generator UI -->
+      <section class="card" aria-label="Compliment Generator">
+        <div class="display-area" aria-live="polite">
+          <p id="compliment-text" class="compliment-text">
+            Click below to initialize sequence. 🚀
+          </p>
+          <div
+            id="loading-spinner"
+            class="loader hidden"
+            aria-label="Loading compliment"
+          ></div>
+        </div>
+        <button id="generate-btn" class="btn-primary">
+          <span>Generate Compliment</span>
+          <span>✨</span>
+        </button>
+      </section>
+
+      <!-- Persistent History UI -->
+      <section class="history-section" aria-label="Recent Compliments">
+        <h2>Recent Compliments</h2>
+        <ul id="history-list" class="history-list">
+          <!-- History items injected via JavaScript -->
+        </ul>
+        <button id="clear-btn" class="btn-clear hidden">
+          <span>Erase History</span>
+          <span>🗑️</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- APP.JS EQUIVALENT                          -->
+    <!-- ========================================== -->
+    <script>
+      /**
+       * Dev Cloud Journey - Compliment Generator Logic
+       * Architected with modularity to allow seamless transition to a Cloud NoSQL DB.
+       */
+
+      // --- 1. Data Mock Layer ---
+      // Represents the data currently sitting in a DB collection.
+      const CLOUD_DB_MOCK = [
+        "Your code is so clean, it could be served in a hospital. 🏥",
+        "You're the CSS to my unstyled HTML. 🎨",
+        "I'd trust you with my root password. 🔑",
+        "Your architecture is more robust than a Nokia 3310. 📱",
+        "You must be a keyboard, because you're exactly my type. ⌨️",
+        "Your commits are like poetry written in binary. 📜",
+        "If you were a function, you'd be `pure` perfection. ✨",
+        "You resolve merge conflicts faster than a couples therapist. 🛋️",
+        "Your API endpoints are a joy to consume. 🍽️",
+        "You optimize loops like you're running out of time. ⏳",
+        "Even the linter has nothing bad to say about you. 😇",
+        "You debug with the swagger of a 90s hacker in a movie. 🕶️",
+        "Your documentation is so good, it belongs in a museum. 🏛️",
+        "You handle edge cases like a stunt driver handles tight corners. 🏎️",
+        "Your variables are perfectly named. *Chef's kiss*. 👨‍🍳",
+        "I'd never `git reset --hard` our friendship. 🤝",
+        "Your pull requests are a breath of fresh air. 🌬️",
+        "You could teach a masterclass on regex (and people would understand). 🧙‍♂️",
+        "You're the missing semicolon that fixes everything. ;",
+        "Your CSS grid layouts never break, even on old browsers. 🌐",
+        "You orchestrate Docker containers like a symphony conductor. 🎼",
+        "Your SQL queries are so fast, they finish before they start. ⚡",
+        "If tech debt was literal debt, you'd be a billionaire. 💰",
+        "You are the human equivalent of a 200 OK status code. ✅",
+        "You make writing tests look genuinely fun. 🧪",
+        "Your dark mode preferences are impeccably tasteful. 🌙",
+        "You navigate the command line like a wizard casting spells. 🪄",
+        "If StackOverflow goes down, I'm calling you. 📞",
+        "Your git history is a beacon of hope in a dark codebase. 🌟",
+        "You deploy to production on Fridays and sleep soundly. 🛌",
+      ];
+
+      // --- 2. Service Layer (Data Fetching) ---
+      class DataService {
+        /**
+         * Simulates an asynchronous network request.
+         * ARCHITECTURE NOTE: When migrating to Firebase, only this method's internals
+         * need to change (e.g., swapping setTimeout for getDocs(collection(db, 'compliments'))).
+         */
+        static async fetchRandomCompliment(previousCompliment) {
+          return new Promise((resolve, reject) => {
+            // Simulating 750ms network latency
+            setTimeout(() => {
+              try {
+                let nextCompliment;
+                // Core Logic 2: Prevent consecutive duplicates
+                do {
+                  const randomIndex = Math.floor(
+                    Math.random() * CLOUD_DB_MOCK.length,
+                  );
+                  nextCompliment = CLOUD_DB_MOCK[randomIndex];
+                } while (
+                  nextCompliment === previousCompliment &&
+                  CLOUD_DB_MOCK.length > 1
+                );
+
+                resolve(nextCompliment);
+              } catch (error) {
+                reject(new Error("Network request failed."));
+              }
+            }, 750);
+          });
+        }
+      }
+
+      // --- 3. Storage Layer (Persistence) ---
+      class StorageService {
+        static STORAGE_KEY = "devCloud_recentCompliments";
+        static MAX_HISTORY = 3;
+
+        // Retrieve history from local storage
+        static getHistory() {
+          try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+          } catch (e) {
+            console.error("Failed to read from localStorage", e);
+            return [];
+          }
+        }
+
+        // Save new item and maintain max limit
+        static saveCompliment(compliment) {
+          let history = this.getHistory();
+          history.unshift(compliment); // Add to top of the list
+
+          // Keep only the last 3 items
+          if (history.length > this.MAX_HISTORY) {
+            history.pop();
+          }
+
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(history));
+          return history;
+        }
+
+        // Clear the history entirely
+        static clearHistory() {
+          localStorage.removeItem(this.STORAGE_KEY);
+          return [];
+        }
+      }
+
+      // --- 4. UI/View Layer ---
+      const DOM = {
+        btn: document.getElementById("generate-btn"),
+        textDisplay: document.getElementById("compliment-text"),
+        spinner: document.getElementById("loading-spinner"),
+        historyList: document.getElementById("history-list"),
+        clearBtn: document.getElementById("clear-btn"),
+      };
+
+      class UIManager {
+        static setLoadingState(isLoading) {
+          if (isLoading) {
+            DOM.btn.disabled = true;
+            DOM.btn.querySelector("span").textContent = "Processing request...";
+            DOM.textDisplay.classList.add("hidden");
+            DOM.spinner.classList.remove("hidden");
+          } else {
+            DOM.btn.disabled = false;
+            DOM.btn.querySelector("span").textContent = "Generate Compliment";
+            DOM.textDisplay.classList.remove("hidden");
+            DOM.spinner.classList.add("hidden");
+          }
+        }
+
+        static renderCompliment(text) {
+          // Remove animation class, trigger reflow, add it back to restart animation
+          DOM.textDisplay.classList.remove("animate-pop");
+          void DOM.textDisplay.offsetWidth; // Trigger DOM reflow
+          DOM.textDisplay.textContent = text;
+          DOM.textDisplay.classList.add("animate-pop");
+        }
+
+        static renderHistory(historyArray) {
+          DOM.historyList.innerHTML = ""; // Clear current list
+
+          if (historyArray.length === 0) {
+            DOM.historyList.innerHTML =
+              '<li class="empty-state">System ready. Awaiting first generation.</li>';
+            DOM.clearBtn.classList.add("hidden");
+            return;
+          }
+
+          // Create and append list items safely
+          historyArray.forEach((item) => {
+            const li = document.createElement("li");
+            li.className = "history-item";
+            li.textContent = item;
+            DOM.historyList.appendChild(li);
+          });
+
+          // Show clear button when history exists
+          DOM.clearBtn.classList.remove("hidden");
+        }
+      }
+
+      // --- 5. Application Controller ---
+      const AppState = {
+        currentCompliment: null,
+        isFetching: false,
+      };
+
+      async function handleGenerateEvent() {
+        // Guard clause to prevent spam-clicking while fetching
+        if (AppState.isFetching) return;
+
+        // 1. Update State & UI to Loading
+        AppState.isFetching = true;
+        UIManager.setLoadingState(true);
+
+        try {
+          // 2. Fetch Data (Async simulation)
+          const newCompliment = await DataService.fetchRandomCompliment(
+            AppState.currentCompliment,
+          );
+
+          // 3. Update State & Persistence
+          AppState.currentCompliment = newCompliment;
+          const updatedHistory = StorageService.saveCompliment(newCompliment);
+
+          // 4. Update UI with new data
+          UIManager.renderCompliment(newCompliment);
+          UIManager.renderHistory(updatedHistory);
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          UIManager.renderCompliment("Connection error. Please try again.");
+        } finally {
+          // 5. Cleanup Loading State
+          AppState.isFetching = false;
+          UIManager.setLoadingState(false);
+        }
+      }
+
+      function handleClearEvent() {
+        // 1. Clear Storage
+        const clearedHistory = StorageService.clearHistory();
+        // 2. Clear UI
+        UIManager.renderHistory(clearedHistory);
+      }
+
+      // --- 6. Initialization ---
+      function bootstrapApp() {
+        // Load and render initial history from local storage
+        const initialHistory = StorageService.getHistory();
+        UIManager.renderHistory(initialHistory);
+
+        // Attach event listeners
+        DOM.btn.addEventListener("click", handleGenerateEvent);
+        DOM.clearBtn.addEventListener("click", handleClearEvent);
+      }
+
+      // Boot the app when the DOM is ready
+      document.addEventListener("DOMContentLoaded", bootstrapApp);
+    </script>
+  </body>
+</html>
